@@ -1,22 +1,32 @@
 package fr.ex.demineur;
 
 public class Main {
-
 	
-	
-	public static void main(String[] args) {
-		char[][] grille = new char[6][12];
-
-		for (int i = 0; i < grille.length; i++) {
-		    for (int j = 0; j < grille[i].length; j++) {
-		        grille[i][j] = '_';
-		    }
-		}
+	// method de créztion de la grille
+	public static char[][] gameGrid(int rows, int columns, char initialSymbol){
+		char[][] grid = new char[rows][columns];
 		
-		// Affichage de la grille
-        for (int i = 0; i < grille.length; i++) {
-            for (int j = 0; j < grille[i].length; j++) {
-                System.out.print(grille[i][j] + "\t");
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				grid[i][j] = initialSymbol;
+			}
+		}
+		return grid;
+	}
+
+	public static void main(String[] args) {
+		
+		// dimensions grille
+		int rows = 6;
+		int columns = 12;
+		
+		// on créer la grille
+		char[][] grid = gameGrid(rows, columns, '*');
+		
+		//affichage grille
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                System.out.print(grid[i][j] + "\t");
             }
             System.out.println();
         }
