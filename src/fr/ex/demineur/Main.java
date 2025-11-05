@@ -4,7 +4,7 @@ import java.util.*;
 public class Main {
 	
 	// system de comptage des mines alentour
-	public static int minesCounting(char[][] grid, int rows, int colums, char mineSymbol) {
+	public static int minesCounting(char[][] grid, int row, int column, char mineSymbol) {
 		int counter = 0;
 		int rows = grid.length;
 		int columns = grid[0].length;
@@ -16,11 +16,11 @@ public class Main {
 				// ignore la case du centre
 				if (i == 0 && j == 0) continue;
 				
-				int numI = rows + i;
-				int numJ = columns +j;
+				int numI =  row + i;
+				int numJ = column +j;
 				
 				// vérif de la limite de la grile
-				if (numI >=0 && numI < rows && numJ < columns) {
+				if (numI >= 0 && numI < rows && numJ >=0 && numJ < columns) {
 					if (grid[numI][numJ] == mineSymbol) {
 						counter++;
 					}
@@ -31,6 +31,7 @@ public class Main {
 		return counter;
 	}
 	
+	// ajout des mines
 	public static void addMines(char[][] grid, int minesNumber, char mineSymbol ) {
 		int rows = grid.length;
 		int columns = grid[0].length;
@@ -63,6 +64,7 @@ public class Main {
 		return grid;
 	}
 	
+	//affichage grille
 	public static void displayGrid(char[][] grid) {
 		int rows = grid.length;
 		int columns = grid[0].length;
@@ -96,15 +98,61 @@ public class Main {
 		int rows = 6;
 		int columns = 12;
 		int minesNumber = 9;
+		char mineSymbol = 'X';
 		
-		// on créer la grille
+		// on créer 2 grille (une caché)
+		char[][] hidenGrid = gameGrid(rows, columns, '-');
 		char[][] grid = gameGrid(rows, columns, '-');
-		
 		// ajout des mines
-		addMines(grid, minesNumber, '*');
+		addMines(grid, minesNumber, mineSymbol);
+		Scanner scan = new Scanner(System.in);
+		// on créer un compteur pour le nombre de case vide restantes
+		int emptyCellsLeft = rows * columns - minesNumber;
 		
-		//affichage grille
+		System.out.println("================DEBUG================");
+		displayGrid(grid);
+		System.out.println("================DEBUG================\n");
+		
+		
+		while (emptyCellsLeft > 0) {
+			displayGrid(hidenGrid);
+			// inputs utilisateur
+			System.out.print("Choisissez une ligne (0 à " + (rows - 1) + ") : ");
+            int row = scan.nextInt();
+            System.out.print("Choisissez une colonne (0 à " + (columns - 1) + ") : ");
+            int column = scan.nextInt();
+            
+            if (row < 0 || row >= rows || column < 0 || column >= columns ) {
+            	System.out.println("Coordonnées invalides!");
+            	continue;
+            }
+            
+            if (hidenGrid[row][column] != '-') {
+            	System.out.println("Case déja révélée!");
+            	continue;
+            }
+            
+            if (grid[row][column] == mineSymbol) {
+            	System.out.println("[Mode Michael Bay]: Vous avez cliqué sur une mine!!!!!");
+            	displayGrid(grid);
+            	System.out.println("Partie Terminé! Game Over! Tu as perdu!");
+            	return;
+            } else {
+            	int closeMines = minesCounting(grid, row, column, mineSymbol);
+            	hidenGrid[row][column] = (char) (0 + closeMines);
+            	emptyCellsLeft--;
+            	System.out.println("Il y as très exactement " + closeMines + " mines autour!");
+            }
+            
+            
+            
+		}
+		
+		
+		//victoire
+		System.out.println("Félicitations! Vous avez gagné (rien du tout)!");
         displayGrid(grid);
+        scan.close();
 
 	}
 
