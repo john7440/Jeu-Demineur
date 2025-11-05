@@ -3,6 +3,34 @@ import java.util.*;
 
 public class Main {
 	
+	// system de comptage des mines alentour
+	public static int minesCounting(char[][] grid, int rows, int colums, char mineSymbol) {
+		int counter = 0;
+		int rows = grid.length;
+		int columns = grid[0].length;
+		
+		// on parcours toutes les directions
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				
+				// ignore la case du centre
+				if (i == 0 && j == 0) continue;
+				
+				int numI = rows + i;
+				int numJ = columns +j;
+				
+				// vérif de la limite de la grile
+				if (numI >=0 && numI < rows && numJ < columns) {
+					if (grid[numI][numJ] == mineSymbol) {
+						counter++;
+					}
+				}
+				
+			}
+		}
+		return counter;
+	}
+	
 	public static void addMines(char[][] grid, int minesNumber, char mineSymbol ) {
 		int rows = grid.length;
 		int columns = grid[0].length;
