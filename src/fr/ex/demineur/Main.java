@@ -66,31 +66,40 @@ public class Main {
 	
 	//affichage grille
 	public static void displayGrid(char[][] grid) {
-		int rows = grid.length;
-		int columns = grid[0].length;
-		
-		// les lignes (sans la dérnière)
-		for (int i = 0; i < rows; i++) {
-			System.out.print("+");
-			for (int j = 0; j < columns; j++) {
-				System.out.print("---+");
-			}
-			System.out.println();
-			
-			//nos colonnes
-			System.out.print("|");
+	    int rows = grid.length;
+	    int columns = grid[0].length;
+
+	    // numéro colonnes
+	    System.out.print("    "); 
+	    for (int j = 0; j < columns; j++) {
+	        System.out.printf("%3d ", j + 1);
+	    }
+	    System.out.println();
+
+	    //la ligne supérieure
+	    System.out.print("    ");
+	    for (int j = 0; j < columns; j++) {
+	        System.out.print("----");
+	    }
+	    System.out.println("-");
+
+	    // lignes avec les numéros
+	    for (int i = 0; i < rows; i++) {
+	        System.out.printf("%2d |", i + 1);
 	        for (int j = 0; j < columns; j++) {
-	            System.out.print(" " + grid[i][j] + " |");
+	            System.out.printf(" %c |", grid[i][j]);
 	        }
-	        System.out.println();	
-		}
-		// la derniere ligne
-		System.out.print("+");
-		for (int j = 0; j < columns; j++ ) {
-			System.out.print("---+");
-		}
-		System.out.println();
+	        System.out.println();
+
+	        // séparateurs
+	        System.out.print("    ");
+	        for (int j = 0; j < columns; j++) {
+	            System.out.print("----");
+	        }
+	        System.out.println("-");
+	    }
 	}
+
 
 	public static void main(String[] args) {
 		
@@ -109,6 +118,7 @@ public class Main {
 		// on créer un compteur pour le nombre de case vide restantes
 		int emptyCellsLeft = rows * columns - minesNumber;
 		
+		// Debug 
 		System.out.println("================DEBUG================");
 		displayGrid(grid);
 		System.out.println("================DEBUG================\n");
@@ -117,29 +127,37 @@ public class Main {
 		while (emptyCellsLeft > 0) {
 			displayGrid(hidenGrid);
 			// inputs utilisateur
-			System.out.print("Choisissez une ligne (0 à " + (rows - 1) + ") : ");
+			System.out.print("Choisissez une ligne (1 à " + (rows) + ") : ");
             int row = scan.nextInt();
-            System.out.print("Choisissez une colonne (0 à " + (columns - 1) + ") : ");
+            System.out.print("Choisissez une colonne (1 à " + (columns) + ") : ");
             int column = scan.nextInt();
             
-            if (row < 0 || row >= rows || column < 0 || column >= columns ) {
+            if (row < 1 || row > rows || column < 1 || column > columns ) {
             	System.out.println("Coordonnées invalides!");
             	continue;
             }
             
-            if (hidenGrid[row][column] != '-') {
+            // modif pour prendre en compte que l'on part de 1 et plus de 0
+            int rowIndex = row -1;
+            int columnIndex = column -1;
+            
+            if (hidenGrid[rowIndex][columnIndex] != '-') {
             	System.out.println("Case déja révélée!");
             	continue;
             }
             
-            if (grid[row][column] == mineSymbol) {
+            if (grid[rowIndex][columnIndex] == mineSymbol) {
+            	System.out.println("======================================================");
             	System.out.println("[Mode Michael Bay]: Vous avez cliqué sur une mine!!!!!");
+            	System.out.println("======================================================");
             	displayGrid(grid);
-            	System.out.println("Partie Terminé! Game Over! Tu as perdu!");
+            	System.out.println("======================================================");
+            	System.out.println("       Partie Terminé! Game Over! Tu as perdu!");
+            	System.out.println("======================================================");
             	return;
             } else {
-            	int closeMines = minesCounting(grid, row, column, mineSymbol);
-            	hidenGrid[row][column] = (char) (0 + closeMines);
+            	int closeMines = minesCounting(grid, rowIndex, columnIndex, mineSymbol);
+            	hidenGrid[rowIndex][columnIndex] = (char) (0 + closeMines);
             	emptyCellsLeft--;
             	System.out.println("Il y as très exactement " + closeMines + " mines autour!");
             }
