@@ -13,6 +13,33 @@ public class Main {
 		}
 		return grid;
 	}
+	
+	public static void displayGrid(char[][] grid) {
+		int rows = grid.length;
+		int columns = grid[0].length;
+		
+		// les lignes (sans la dérnière)
+		for (int i = 0; i < rows; i++) {
+			System.out.print("+");
+			for (int j = 0; j < columns; j++) {
+				System.out.print("---+");
+			}
+			System.out.println();
+			
+			//nos colonnes
+			System.out.print("|");
+	        for (int j = 0; j < columns; j++) {
+	            System.out.print(" " + grid[i][j] + " |");
+	        }
+	        System.out.println();	
+		}
+		// la derniere ligne
+		System.out.print("+");
+		for (int j = 0; j < columns; j++ ) {
+			System.out.print("---+");
+		}
+		System.out.println();
+	}
 
 	public static void main(String[] args) {
 		
@@ -24,12 +51,7 @@ public class Main {
 		char[][] grid = gameGrid(rows, columns, '*');
 		
 		//affichage grille
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                System.out.print(grid[i][j] + "\t");
-            }
-            System.out.println();
-        }
+        displayGrid(grid);
 
 	}
 
