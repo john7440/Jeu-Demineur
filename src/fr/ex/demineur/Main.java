@@ -149,24 +149,22 @@ public class Main {
             if (grid[rowIndex][columnIndex] == mineSymbol) {
             	System.out.println("======================================================");
             	System.out.println("[Mode Michael Bay]: Vous avez cliqué sur une mine!!!!!");
-            	System.out.println("======================================================");
+            	System.out.println("======================================================\n");
             	displayGrid(grid);
-            	System.out.println("======================================================");
+            	System.out.println("\n======================================================");
             	System.out.println("       Partie Terminé! Game Over! Tu as perdu!");
             	System.out.println("======================================================");
             	return;
             } else {
             	int closeMines = minesCounting(grid, rowIndex, columnIndex, mineSymbol);
-            	hidenGrid[rowIndex][columnIndex] = (char) (0 + closeMines);
+            	hidenGrid[rowIndex][columnIndex] = (closeMines == 0) ? ' ' : (char) ('0' + closeMines);
             	emptyCellsLeft--;
+            	System.out.println("\n========================================================");
             	System.out.println("Il y as très exactement " + closeMines + " mines autour!");
+            	System.out.println("========================================================");
             }
             
-            
-            
 		}
-		
-		
 		//victoire
 		System.out.println("Félicitations! Vous avez gagné (rien du tout)!");
         displayGrid(grid);
