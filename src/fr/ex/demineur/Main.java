@@ -3,23 +3,68 @@ import java.util.*;
 
 public class Main {
 	
+	// recalcul des case vide a cause de la découverte en cascade
+	public static int recalculateEmptyCells(char[][] visibleGrid, char[][] grid, char symboleMine) {
+	    int count = 0;
+	    for (int i = 0; i < visibleGrid.length; i++) {
+	        for (int j = 0; j < visibleGrid[0].length; j++) {
+	            if (visibleGrid[i][j] == '-' && grid[i][j] != symboleMine) {
+	                count++;
+	            }
+	        }
+	    }
+	    return count;
+	}
+	
+	// system cascade
+	public static void serialDiscovery(char[][] visibleGrid, char[][]hidenGrid, int row, int column, char mineSymbol) {
+		int rows = visibleGrid.length;
+		int columns = visibleGrid[0].length;
+		
+		// verif des limites
+		if ( row < 0 || row >= rows || column < 0 || column >= columns) return;
+		
+		//verif deja vu
+		if (visibleGrid[row][column] != '-') return;
+		
+		// si ya une mine, on ne révèle pas
+		if (visibleGrid[row][column] == mineSymbol) return;
+		
+		int closeMines = minesCounting(hidenGrid, row, column, mineSymbol);
+		
+		//on revele la case
+		visibleGrid[row][column] = (closeMines == 0) ? ' ' : (char) ('0' + closeMines);
+		
+		// dans le cas ou ya aucune mine autour, on dévoiles les 8 voisins
+		if (closeMines ==0) {
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					if (i != 0 || j != 0) {
+						serialDiscovery(visibleGrid, hidenGrid, row + i, column + j, mineSymbol);
+					}
+				}
+			}
+		}
+		
+	}
+	
 	// system de comptage des mines alentour
 	public static int minesCounting(char[][] grid, int row, int column, char mineSymbol) {
 		int counter = 0;
 		int rows = grid.length;
 		int columns = grid[0].length;
 		
-		// on parcours toutes les directions
+		// 
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
 				
-				// ignore la case du centre
+				// ignore the self case
 				if (i == 0 && j == 0) continue;
 				
 				int numI =  row + i;
 				int numJ = column +j;
 				
-				// vérif de la limite de la grile
+				// grid limit verification
 				if (numI >= 0 && numI < rows && numJ >=0 && numJ < columns) {
 					if (grid[numI][numJ] == mineSymbol) {
 						counter++;
@@ -99,7 +144,26 @@ public class Main {
 	        System.out.println("-");
 	    }
 	}
-
+	
+	// validation des entrées
+	public static int inputValidation(Scanner scan, String message, int min, int max) {
+	    int valeur = -1;
+	    while (true) {
+	        System.out.print(message);
+	        if (scan.hasNextInt()) {
+	            valeur = scan.nextInt();
+	            if (valeur >= min && valeur <= max) {
+	                break;
+	            } else {
+	                System.out.println("\nValeur hors limites (" + min + " à " + max + ")!");
+	            }
+	        } else {
+	            System.out.println("\nEntrée invalide! Veuillez saisir un nombre: ");
+	            scan.next();
+	        }
+	    }
+	    return valeur;
+	}
 
 	public static void main(String[] args) {
 		
@@ -116,24 +180,22 @@ public class Main {
 		addMines(grid, minesNumber, mineSymbol);
 		Scanner scan = new Scanner(System.in);
 		// on créer un compteur pour le nombre de case vide restantes
-		int emptyCellsLeft = rows * columns - minesNumber;
+		int emptyCellsLeft = recalculateEmptyCells(hidenGrid, grid , mineSymbol);
 		
 		// Debug 
-		System.out.println("================DEBUG================");
-		displayGrid(grid);
-		System.out.println("================DEBUG================\n");
+		//System.out.println("================DEBUG================");
+		//displayGrid(grid);
+		//System.out.println("================DEBUG================\n");
 		
 		
 		while (emptyCellsLeft > 0) {
 			displayGrid(hidenGrid);
 			// inputs utilisateur
-			System.out.print("Choisissez une ligne (1 à " + (rows) + ") : ");
-            int row = scan.nextInt();
-            System.out.print("Choisissez une colonne (1 à " + (columns) + ") : ");
-            int column = scan.nextInt();
+            int row = inputValidation(scan,"Choisissez une ligne (1 à " + (rows) + ") : ", 1, rows);
+            int column = inputValidation(scan,"Choisissez une colonne (1 à " + (columns) + ") : ", 1, columns );
             
             if (row < 1 || row > rows || column < 1 || column > columns ) {
-            	System.out.println("Coordonnées invalides!");
+            	System.out.println("\nErreur: Coordonnées invalides!");
             	continue;
             }
             
@@ -142,7 +204,7 @@ public class Main {
             int columnIndex = column -1;
             
             if (hidenGrid[rowIndex][columnIndex] != '-') {
-            	System.out.println("Case déja révélée!");
+            	System.out.println("\nAttention: Case déja révélée!\n");
             	continue;
             }
             
@@ -156,20 +218,15 @@ public class Main {
             	System.out.println("======================================================");
             	return;
             } else {
-            	int closeMines = minesCounting(grid, rowIndex, columnIndex, mineSymbol);
-            	hidenGrid[rowIndex][columnIndex] = (closeMines == 0) ? ' ' : (char) ('0' + closeMines);
-            	emptyCellsLeft--;
-            	System.out.println("\n========================================================");
-            	System.out.println("Il y as très exactement " + closeMines + " mines autour!");
-            	System.out.println("========================================================");
+            	serialDiscovery(hidenGrid, grid , rowIndex, columnIndex, mineSymbol);
             }
             
 		}
 		//victoire
+		scan.close();
 		System.out.println("Félicitations! Vous avez gagné (rien du tout)!");
         displayGrid(grid);
-        scan.close();
-
+        
 	}
 
 }
