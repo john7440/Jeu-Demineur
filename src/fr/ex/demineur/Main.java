@@ -3,15 +3,15 @@ import java.util.*;
 
 public class Main {
 	
-	// recalcul des case vide a cause de la découverte en cascade
-	public static int recalculateEmptyCells(char[][] visibleGrid, char[][] grid, char symboleMine) {
+	// This method is used to update the empty cells accordingly to the state of the grid 
+	public static int recalculateEmptyCells(char[][] visibleGrid, char[][] grid, char symboleMine, char flagCell) {
 		// We initialize a counter
 	    int count = 0;
 	    
 	    // We check if the there is a '-' or a 'X' symbol which represent a mine 
 	    for (int i = 0; i < visibleGrid.length; i++) {
 	        for (int j = 0; j < visibleGrid[0].length; j++) {
-	            if (visibleGrid[i][j] == '-' && grid[i][j] != symboleMine) {
+	            if ((visibleGrid[i][j] == '-' || visibleGrid[i][j] == flagCell) && grid[i][j] != symboleMine) {
 	                count++;
 	            }
 	        }
@@ -187,18 +187,24 @@ public class Main {
 		addMines(grid, minesNumber, mineSymbol);
 		Scanner scan = new Scanner(System.in);
 		
+		//Initialize a variable for the flag
+		char flagCell = 'F';
+		
 		// We create this variable to check and keep recalculating (for the serial discovery)
 		// the number of empty cells
-		int emptyCellsLeft = recalculateEmptyCells(hidenGrid, grid , mineSymbol);
+		int emptyCellsLeft = recalculateEmptyCells(hidenGrid, grid , mineSymbol, flagCell);
 		
 		// Debug 
 		//System.out.println("================DEBUG================");
 		//displayGrid(grid);
 		//System.out.println("================DEBUG================\n");
 		
-		
 		while (emptyCellsLeft > 0) {
 			displayGrid(hidenGrid);
+			
+			// Prompt to know if the user want to reveal or flag a cell
+			System.out.print("Souhaitez-vous (R)évéler ou (D)raper une case ? (R/D) : ");
+			char action = scan.next().toUpperCase().charAt(0);
 			
 			// User inputs
             int row = inputValidation(scan,"Choisissez une ligne (1 à " + (rows) + ") : ", 1, rows);
@@ -214,10 +220,38 @@ public class Main {
             int rowIndex = row -1;
             int columnIndex = column -1;
             
+            // Check if the action is 'D' which mean the user want to flag a cell
+            if (action == 'D') {
+            	
+            	// if the cell is already revealed or flagged
+                if (hidenGrid[rowIndex][columnIndex] != '-' && hidenGrid[rowIndex][columnIndex] != flagCell) {
+                    System.out.println("\nImpossible de poser un drapeau sur une case déja révélée!");
+                    continue;
+                }
+                
+                // Removing the flag
+                if (hidenGrid[rowIndex][columnIndex] == flagCell) {
+                    hidenGrid[rowIndex][columnIndex] = '-';
+                    System.out.println("\nVous avez retiré un drapeau!");
+                } else {
+                	
+                  // Adding the flag
+                    hidenGrid[rowIndex][columnIndex] = flagCell;
+                    System.out.println("\nVous avez posé un drapeau!");
+                }
+                continue;
+            }
+            
             // Checking if the cells was already revealed
             if (hidenGrid[rowIndex][columnIndex] != '-') {
             	System.out.println("\nAttention: Case déja révélée!\n");
             	continue;
+            }
+            
+            // Check if the cell is flagged
+            if (hidenGrid[rowIndex][columnIndex] == flagCell) {
+                System.out.println("\nImpossible de révéler une case marquée d'un drapeau !");
+                continue;
             }
             
             // Display loose condition
@@ -235,7 +269,7 @@ public class Main {
             }
             
 		}
-		// Victory's display
+		// Victory's (of nothing) display 
 		scan.close();
 		System.out.println("Félicitations! Vous avez gagné (rien du tout)!");
         displayGrid(grid);
